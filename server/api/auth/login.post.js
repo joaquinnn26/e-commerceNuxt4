@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
   const token = signToken(user)
 
   return {
+    id: user._id,
     message: 'Login exitoso',
     token
   }

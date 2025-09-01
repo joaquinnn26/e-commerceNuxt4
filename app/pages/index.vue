@@ -1,20 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useCart } from '~/composables/useCart'
 
 const products = ref([])
-
-// Simulamos un carrito en localStorage
-const addToCart = (product) => {
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]')
-  const existing = cart.find(p => p._id === product._id)
-  if (existing) {
-    existing.quantity += 1
-  } else {
-    cart.push({ ...product, quantity: 1 })
-  }
-  localStorage.setItem('cart', JSON.stringify(cart))
-  alert(`${product.name} agregado al carrito`)
-}
+const { addToCart, setUserFromStorage, fetchCart } = useCart()
 
 const fetchProducts = async () => {
   try {
@@ -24,7 +13,11 @@ const fetchProducts = async () => {
   }
 }
 
-onMounted(fetchProducts)
+onMounted(() => {
+  setUserFromStorage()
+  fetchCart()
+  fetchProducts()
+})
 </script>
 
 <template>
@@ -46,7 +39,7 @@ onMounted(fetchProducts)
             </div>
             <footer class="card-footer">
               <NuxtLink :to="`/product/${prod._id}`" class="card-footer-item">Ver detalles</NuxtLink>
-              <a class="card-footer-item" @click.prevent="addToCart(prod)">Agregar al carrito</a>
+              <a class="card-footer-item" @click.prevent="addToCart(prod._id)">Agregar al carrito</a>
             </footer>
           </div>
         </div>

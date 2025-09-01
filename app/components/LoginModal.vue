@@ -20,8 +20,8 @@ const handleLogin = async () => {
     })
 
     // Guardar token en localStorage
-    localStorage.setItem('user', res.token)
-
+    localStorage.setItem('token', res.token)
+        localStorage.setItem('user', res.id)
     // Emitir login con info del usuario
     emit('login', res.user)
 

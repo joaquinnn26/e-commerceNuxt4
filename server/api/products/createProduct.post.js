@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const newProduct = await createProduct(body);
     return newProduct;
     } catch (error) {
-        console.log(error)
+
         throw createError({ statusCode: 500, statusMessage: 'Error al crear el producto en api', data: error.message });
     }
 

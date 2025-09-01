@@ -2,15 +2,23 @@ import { connectDB } from '~~/server/utils/db.js'
 import Cart from '~~/server/models/cart.js'
 
 
+
 async function getCartByUserId(userId) {
     await connectDB();
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    if (!cart) {
-        throw createError({ statusCode: 404, statusMessage: 'Carrito no encontrado' });
-    }
-    return cart;
-}   
 
+    if (!userId) {
+        throw new Error("No se recibió un userId válido");
+    }
+
+    let cart = await Cart.findOne({ userId }).populate('items.productId');
+
+    if (!cart) {
+        cart = new Cart({ userId, items: [] });
+        await cart.save();
+    }
+
+    return cart;
+}
 async function createCart(userId) {
     await connectDB();
     const existingCart = await Cart.findOne({ userId });
@@ -44,3 +52,21 @@ async function removeItemFromCart(userId, productId) {
     }   
     cart.items = cart.items.filter(item => item.productId.toString() !== productId);
     await cart.save();  }
+
+async function clearCart(userId) {
+    await connectDB();
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {    
+        throw createError({ statusCode: 404, statusMessage: 'Carrito no encontrado' });
+    }   
+    cart.items = [];
+    await cart.save();  }       
+
+    export {
+    getCartByUserId,
+    createCart,
+    addItemToCart,
+    removeItemFromCart,
+    clearCart
+
+    }

@@ -1,3 +1,4 @@
+import Cart from '~~/server/models/cart.js'
 import User from '~~/server/models/Users.js'
 import { connectDB } from '~~/server/utils/db.js'
 import bcrypt from 'bcryptjs'
@@ -12,7 +13,7 @@ async function getUserByEmail(email) {
 }
 async function createUser(userData) {
     await connectDB()
-    const { email, password, name } = userData  
+    const {email, password, name } = userData  
 
     if(!email || !password || !name) {
     throw createError({ statusCode: 400, statusMessage: 'Todos los campos son obligatorios' })
@@ -25,7 +26,7 @@ async function createUser(userData) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const newUser =await User.create({ email, passwordHash, name })
-
+    await Cart.create({ userId: newUser._id, items: [] });
     return {
     id: newUser._id,
     email: newUser.email,

@@ -6,7 +6,8 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
   const newUser = await createUser(body)
-
+  
+  
   return {
     message: 'Usuario creado correctamente',
     user: newUser

@@ -26,8 +26,7 @@ const saveProduct = async (product) => {
       precio: Number(product.precio)     // asegurarse de que sea número
     }
     if (modalMode.value === 'create') {
-      console.log(product)
-      console.log("entro aca")
+
       await $fetch('/api/products/createProduct', { method: 'POST', body: product })
     } else {
       await $fetch(`/api/products/${product._id}`, { method: 'PUT', body: product })

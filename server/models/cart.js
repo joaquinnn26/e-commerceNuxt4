@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
 
 const cartSchemas = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId,ref: "Users", required: true }, 
+  userId: { type: mongoose.Schema.Types.ObjectId,ref: "User", required: true }, 
     items: [
         {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "products" },
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, default: 1 },
         },
     ],
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: { type: Date, default: Date.now }
 },{ timestamps: true });
-export const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchemas);
+export default mongoose.models.Cart || mongoose.model('Cart', cartSchemas);
