@@ -19,7 +19,7 @@ watch(() => props.modelValue, (newVal) => {
 // Resetear formulario al abrir modal en create
 watch(() => props.isActive, (active) => {
   if (active && props.mode === 'create') {
-    localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '' }
+    localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: ''}
   }
 })
 
@@ -44,7 +44,19 @@ const save = () => {
             <input class="input" v-model="localProduct.nombre" placeholder="Nombre" />
           </div>
         </div>
-
+        <div class="field">
+          <label class="label">Categoría</label>
+          <div class="control">
+            <div class="select">
+              <select v-model="localProduct.categoria">
+                <option value="">Seleccionar</option>
+                <option value="electronica">Electrónica</option>
+                <option value="ropa">Ropa</option>
+                <option value="hogar">Hogar</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div class="field">
           <label class="label">Precio</label>
           <div class="control">

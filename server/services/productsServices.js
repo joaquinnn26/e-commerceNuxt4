@@ -19,11 +19,11 @@ async function getProductById(id) {
 
 async function createProduct(producto) {
     await connectDB();
-    const { nombre, descripcion, precio, stock, imagen } = producto;
-    if (!nombre || !descripcion || !precio || !stock || !imagen) {
+    const { nombre, descripcion, precio, stock, imagen, categoria } = producto;
+    if (!nombre || !descripcion || !precio || !stock || !imagen || !categoria) {
         throw createError({ statusCode: 400, statusMessage: 'Todos los campos son obligatorios' });
     }
-    const newProduct = await Product.create({ nombre, descripcion, precio, stock, imagen });
+    const newProduct = await Product.create({ nombre, descripcion, precio, stock, imagen, categoria });
     return newProduct;  
 
 }

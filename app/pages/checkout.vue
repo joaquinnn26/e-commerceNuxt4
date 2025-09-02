@@ -18,6 +18,19 @@ const finalizarCompra = () => {
 const config = useRuntimeConfig()
 const numeroVendedor = config.public.numeroVendedor
 console.log(numeroVendedor)
+
+ const camposVacios = Object.entries(envio.value)
+    .filter(([key, value]) => value.trim() === '')
+    .map(([key]) => key)
+
+  if (camposVacios.length > 0) {
+    alert(`Por favor completa los siguientes campos: ${camposVacios.join(', ')}`)
+    return
+  }
+  if (cart.value.length === 0) {
+    alert('El carrito está vacío.')
+    return
+  }
   // Detalle de productos
   let detalleProductos = cart.value
     .map(
@@ -109,23 +122,27 @@ const total = computed(() =>
         </tbody>
       </table>
       <div class="box mt-4">
-        <h2 class="subtitle">Datos de envío</h2>
-        <input v-model="envio.nombre" type="text" placeholder="Nombre completo" class="input mb-2" />
-        <input v-model="envio.direccion" type="text" placeholder="Dirección (calle, número, piso, depto)" class="input mb-2" />
-        <input v-model="envio.localidad" type="text" placeholder="Localidad" class="input mb-2" />
-        <input v-model="envio.codigoPostal" type="text" placeholder="Código Postal" class="input mb-2" />
-        <input v-model="envio.ciudad" type="text" placeholder="Ciudad" class="input mb-2" />
-        <input v-model="envio.provincia" type="text" placeholder="Provincia" class="input mb-2" />
-      </div>
-      <div class="level">
-        <div class="level-left">
-          <strong>Total a pagar: ${{ total }}</strong>
-        </div>
-      </div>
+    <h2 class="subtitle">Datos de envío</h2>
+    <input v-model="envio.nombre" type="text" placeholder="Nombre completo" class="input mb-2" />
+    <input v-model="envio.direccion" type="text" placeholder="Dirección (calle, número, piso, depto)" class="input mb-2" />
+    <input v-model="envio.localidad" type="text" placeholder="Localidad" class="input mb-2" />
+    <input v-model="envio.codigoPostal" type="text" placeholder="Código Postal" class="input mb-2" />
+    <input v-model="envio.ciudad" type="text" placeholder="Ciudad" class="input mb-2" />
+    <input v-model="envio.provincia" type="text" placeholder="Provincia" class="input mb-2" />
 
-      <button class="button is-primary mt-4" @click="finalizarCompra">
-        Finalizar Compra via WhatsApp
-      </button>
+    <div class="level">
+      <div class="level-left">
+        <strong>Total a pagar: ${{ total }}</strong>
+      </div>
     </div>
+
+    <button 
+      class="button is-primary mt-4"
+      @click="finalizarCompra"
+    >
+      Finalizar Compra via WhatsApp
+    </button>
+  </div>
+  </div>
   </section>
 </template>

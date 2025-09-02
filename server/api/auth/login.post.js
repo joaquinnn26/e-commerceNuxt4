@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
   return {
     id: user._id,
     message: 'Login exitoso',
-    token
+    token,
+    role: user.role,
   }
 })

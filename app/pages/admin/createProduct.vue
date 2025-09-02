@@ -72,6 +72,7 @@ onMounted(fetchProducts)
           <tr>
             <th>Nombre</th>
             <th>Precio</th>
+            <th>Categoria</th>
             <th>Descripción</th>
             <th>Acciones</th>
           </tr>
@@ -80,6 +81,7 @@ onMounted(fetchProducts)
           <tr v-for="prod in products" :key="prod._id">
             <td>{{ prod.nombre }}</td>
             <td>{{ prod.precio }}</td>
+            <td>{{ prod.categoria }}</td>
             <td>{{ prod.descripcion }}</td>
             <td>
               <button class="button is-small is-info mr-2" @click="editProduct(prod)">Editar</button>

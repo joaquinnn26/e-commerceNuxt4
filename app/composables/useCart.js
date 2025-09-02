@@ -5,8 +5,14 @@ const userId = ref('')
 
 export const useCart = () => {
   const setUserFromStorage = () => {
-    const id = localStorage.getItem('user')
-    if (id) userId.value = id
+    const userString = localStorage.getItem('user')
+   if (!userString) return
+  try {
+    const user = JSON.parse(userString)
+    if (user.id) userId.value = user.id // ✅ solo el ObjectId
+  } catch (err) {
+    console.error('Error parsing user from localStorage', err)
+  }
   }
 
   const fetchCart = async () => {

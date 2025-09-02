@@ -19,9 +19,14 @@ const handleLogin = async () => {
       body: { email: email.value, password: password.value }
     })
 
+    console.log('Respuesta del login:', res)
     // Guardar token en localStorage
-    localStorage.setItem('token', res.token)
-        localStorage.setItem('user', res.id)
+      const userData = {
+      id: res.id,
+      token: res.token,
+      role: res.role 
+    }
+    localStorage.setItem('user', JSON.stringify(userData))
     // Emitir login con info del usuario
     emit('login', res.user)
 
