@@ -14,24 +14,50 @@ const envio = ref({
   provincia: ''
 })
 
-const finalizarCompra = () => {
-const config = useRuntimeConfig()
-const numeroVendedor = config.public.numeroVendedor
-console.log(numeroVendedor)
+const finalizarCompra = async () => {
+  const config = useRuntimeConfig()
+  const numeroVendedor = config.public.numeroVendedor
 
- const camposVacios = Object.entries(envio.value)
-    .filter(([key, value]) => value.trim() === '')
+  const user = JSON.parse(localStorage.getItem("user"))
+  if (!user) {
+    alert("Debes iniciar sesión")
+    return
+  }
+
+  const camposVacios = Object.entries(envio.value)
+    .filter(([key, value]) => value.trim() === "")
     .map(([key]) => key)
 
   if (camposVacios.length > 0) {
-    alert(`Por favor completa los siguientes campos: ${camposVacios.join(', ')}`)
+    alert(`Por favor completa los siguientes campos: ${camposVacios.join(", ")}`)
     return
   }
+
   if (cart.value.length === 0) {
-    alert('El carrito está vacío.')
+    alert("El carrito está vacío.")
     return
   }
-  // Detalle de productos
+
+
+  try {
+    await $fetch("/api/orders/createOrder", {
+      method: "POST",
+      body: {
+        userId: user.id, // el ID del usuario logueado
+        items: cart.value.map(item => ({
+          productId: item.productId._id,
+          quantity: item.quantity
+        })),
+        total: total.value,
+        estado: "pendiente"
+      }
+    })
+  } catch (error) {
+    alert(error.message || "Error al crear la orden en la base de datos")
+    return
+  }
+
+
   let detalleProductos = cart.value
     .map(
       (item) =>
@@ -39,7 +65,6 @@ console.log(numeroVendedor)
     )
     .join("\n");
 
-  // Datos de envío
   let datosEnvio = `
 Nombre: ${envio.value.nombre}
 Dirección: ${envio.value.direccion}
@@ -49,11 +74,9 @@ Ciudad: ${envio.value.ciudad}
 Provincia: ${envio.value.provincia}
   `;
 
-  // Mensaje final
   let mensaje = `📦 Nueva compra:\n\n${detalleProductos}\n\n💰 Total: $${total.value}\n\n🚚 Datos de envío:\n${datosEnvio}`;
-  console.log(mensaje);
-  console.log(numeroVendedor)
-  // Abrir WhatsApp
+
+  // 3️⃣ Abrir WhatsApp
   let url = `https://wa.me/${numeroVendedor}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
 };

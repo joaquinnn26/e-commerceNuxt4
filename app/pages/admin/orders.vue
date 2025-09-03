@@ -11,7 +11,7 @@ const fetchOrders = async () => {
   loading.value = true
   error.value = null
   try {
-    const res = await $fetch('/api/orders')
+    const res = await $fetch('/api/orders/allOrders')
     orders.value = res
   } catch (err) {
     error.value = err.message || 'Error al cargar órdenes'
@@ -19,7 +19,16 @@ const fetchOrders = async () => {
     loading.value = false
   }
 }
-
+const borrarOrden = async (orderId) => {
+  if (!confirm('¿Estás seguro de que deseas borrar esta orden?')) return
+  try {
+    await $fetch(`/api/orders/${orderId}`, { method: 'DELETE' })
+    alert('Orden borrada')
+    fetchOrders()
+  } catch (err) {
+    alert(err.message || 'Error al borrar orden')
+  }
+}
 // Confirmar orden
 const confirmOrder = async (orderId) => {
   try {
@@ -63,29 +72,32 @@ const currency = (value) => {
       <tbody>
         <tr v-for="order in orders" :key="order._id">
           <td>{{ order._id }}</td>
-          <td>{{ order.user.email || order.userId }}</td>
+          <td>{{  order.userId.email }}</td>
           <td>
             <ul>
-              <li v-for="item in order.items" :key="item.productId">{{ item.name }} x {{ item.quantity }}</li>
+              <li v-for="item in order.items" :key="item.productId">{{ item.productId.nombre }} x {{ item.quantity }}</li>
             </ul>
           </td>
           <td>{{ currency(order.total) }}</td>
           <td>
             <span
               class="tag"
-              :class="order.status === 'pending' ? 'is-warning' : 'is-success'"
+              :class="order.estado === 'pendiente' ? 'is-warning' : 'is-success'"
             >
-              {{ order.status }}
+              {{ order.estado }}
             </span>
           </td>
           <td>
             <button
-              v-if="order.status === 'pending'"
+              v-if="order.estado === 'pendiente'"
               class="button is-small is-success"
               @click="confirmOrder(order._id)"
             >
               Confirmar
             </button>
+            <button @click="borrarOrden(order._id)" class="button is-small is-danger">
+              Borrar
+              </button>
           </td>
         </tr>
       </tbody>
