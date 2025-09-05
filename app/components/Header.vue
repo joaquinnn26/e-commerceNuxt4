@@ -59,7 +59,7 @@ const handleCartUpdate = async (action) => {
 }
 
 const logout = () => {
-  localStorage.removeItem('user')
+  localStorage.removeItem('user','token')
   isLoggedIn.value = false
   isAdmin.value = false
   location.reload()

@@ -57,7 +57,9 @@ const deleteProduct = async (id) => {
     alert(err.message || 'Error al eliminar producto')
   }
 }
-
+definePageMeta({
+  middleware: ['admin']
+})
 onMounted(fetchProducts)
 </script>
 

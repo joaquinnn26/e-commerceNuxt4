@@ -17,6 +17,9 @@ const fetchOrders = async () => {
 const fetchProducts = async () => {
   products.value = await $fetch('/api/products/allProducts')
 }
+definePageMeta({
+  middleware: ['admin']
+})
 onMounted(()=>{
   fetchProducts()
   fetchOrders()

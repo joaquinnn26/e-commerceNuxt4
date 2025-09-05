@@ -49,6 +49,9 @@ const currency = (value) => {
   if (!value) return '$0'
   return '$' + Number(value).toFixed(2)
 }
+definePageMeta({
+  middleware: ['admin']
+})
 </script>
 
 <template>

@@ -1,9 +1,16 @@
-export default defineNuxtRouteMiddleware((to) => {
-  if (typeof window !== 'undefined') { // Esto indica que estamos en el cliente
-    const token = localStorage.getItem('token')
-    const role = localStorage.getItem('role') // guardaste el rol al logear
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  if (process.server) return
+  const storedUser = localStorage.getItem('user')
+  if (!storedUser) return navigateTo('/')
 
-    if (!token) return navigateTo('/login')
-    if (role !== 'admin') return navigateTo('/no-autorizado')
+  const { token } = JSON.parse(storedUser)
+  try {
+    const { role } = await $fetch('/api/auth/validate', {
+      method: 'POST',
+      body: { token }
+    })
+    if (role !== 'admin') return navigateTo('/')
+  } catch {
+    return navigateTo('/login')
   }
 })

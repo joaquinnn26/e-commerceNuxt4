@@ -4,13 +4,13 @@ export function signToken(user) {
   const payload = {
     id: user._id,
     email: user.email,
-    name: user.name
+    name: user.name,
+    role: user.role
   }
 
-  // useRuntimeConfig() para leer el secreto desde runtime
   const config = useRuntimeConfig()
 
-  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' })
+  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '7d' })
 }
 
 export function verifyToken(token) {
