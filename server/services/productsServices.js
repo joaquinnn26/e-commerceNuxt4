@@ -16,7 +16,28 @@ async function getProductById(id) {
   } 
   return product;
 }
+export const getPaginatedProducts = async (page = 1, limit = 8, category = null, search = '') => {
+  await connectDB();
 
+  const filter = {};
+
+  // Filtrar por categoría si existe
+  if (category) filter.categoria = category;
+
+  // Filtrar por búsqueda en el nombre si existe
+  if (search) filter.nombre = { $regex: search, $options: 'i' };
+
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    Product.find(filter).skip(skip).limit(limit),
+    Product.countDocuments(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return { data, totalPages, currentPage: page };
+};
 async function createProduct(producto) {
     await connectDB();
     const { nombre, descripcion, precio, stock, imagen, categoria } = producto;

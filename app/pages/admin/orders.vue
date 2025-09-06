@@ -12,6 +12,7 @@ const fetchOrders = async () => {
   error.value = null
   try {
     const res = await $fetch('/api/orders/allOrders')
+    console.log(res)
     orders.value = res
   } catch (err) {
     error.value = err.message || 'Error al cargar órdenes'
@@ -78,7 +79,7 @@ definePageMeta({
           <td>{{  order.userId.email }}</td>
           <td>
             <ul>
-              <li v-for="item in order.items" :key="item.productId">{{ item.productId.nombre }} x {{ item.quantity }}</li>
+              <li v-for="item in order.items" :key="item.productId">{{ item.productId?.nombre || 'Producto eliminado' }} x {{ item.quantity }}</li>
             </ul>
           </td>
           <td>{{ currency(order.total) }}</td>

@@ -5,7 +5,10 @@ import ProductModal from '~/components/ProductModal.vue'
 const products = ref([])
 const showModal = ref(false)
 const modalMode = ref('create')
+
 const currentProduct = ref({ nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', _id: '' })
+let token = ref(null)
+
 
 // Traer productos
 const fetchProducts = async () => {
@@ -27,9 +30,13 @@ const saveProduct = async (product) => {
     }
     if (modalMode.value === 'create') {
 
-      await $fetch('/api/products/createProduct', { method: 'POST', body: product })
+      await $fetch('/api/products/admin/createProduct', { method: 'POST',headers: {
+    Authorization: `Bearer ${token.value}`
+  }, body: product })
     } else {
-      await $fetch(`/api/products/${product._id}`, { method: 'PUT', body: product })
+      await $fetch(`/api/products/admin/${product._id}`, { method: 'PUT',headers: {
+    Authorization: `Bearer ${token.value}`
+  }, body: product })
     }
     await fetchProducts()
   } catch (err) {
@@ -51,16 +58,30 @@ const createProduct = () => {
 const deleteProduct = async (id) => {
   if (!confirm('¿Seguro querés eliminar este producto?')) return
   try {
-    await $fetch(`/api/products/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/products/admin/${id}`, { method: 'DELETE' ,headers: {
+    Authorization: `Bearer ${token.value}`
+  }})
     await fetchProducts()
   } catch (err) {
     alert(err.message || 'Error al eliminar producto')
   }
 }
+
 definePageMeta({
-  middleware: ['admin']
+  middleware: 'admin'
 })
-onMounted(fetchProducts)
+
+onMounted(()=>{
+  fetchProducts();
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    const userObj = JSON.parse(storedUser)
+    token.value = userObj.token 
+  }
+}
+  
+
+)
 </script>
 
 <template>

@@ -23,30 +23,20 @@ const toggleCart = () => {
 onMounted(() => {
   setUserFromStorage()
   fetchCart()
-  let userData = null
-try {
   const storedUser = localStorage.getItem('user')
-  userData = storedUser ? JSON.parse(storedUser) : null
-} catch (error) {
-  console.error('Error al parsear el usuario desde localStorage', error)
-}
+  const userData = storedUser ? JSON.parse(storedUser) : null
 
- if (userData) {
+  if (userData) {
     isLoggedIn.value = true          
     setUserFromStorage()             
     fetchCart()                      
-  }
 
-  if (userData?.role === 'admin') {
-    isAdmin.value = true
-  }
-
-  if (isLoggedIn.value) {
-    setUserFromStorage()
-    fetchCart()
+    if (userData.role === 'admin') {
+      isAdmin.value = true
+    }
   }
 })
-
+const showMenu=ref(false)
 const handleCheckout = () => {
   showCart.value = false
   window.location.href = '/checkout'
@@ -59,7 +49,8 @@ const handleCartUpdate = async (action) => {
 }
 
 const logout = () => {
-  localStorage.removeItem('user','token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('token')
   isLoggedIn.value = false
   isAdmin.value = false
   location.reload()
@@ -67,65 +58,81 @@ const logout = () => {
 </script>
 
 <template>
-  <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <NuxtLink class="navbar-item" to="/">MiTienda</NuxtLink>
-    </div>
+<nav class="navbar is-primary px-4 py-3" role="navigation" aria-label="main navigation">
+  <!-- IZQUIERDA: LOGO -->
+  <div class="navbar-brand">
+    <NuxtLink to="/" class="navbar-item">
 
-    <div class="navbar-menu">
-      <div class="navbar-start">
-        <!-- Menú desplegable de categorías -->
-        <div v-if="!isAdmin" class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">Categorías</a>
-          <div class="navbar-dropdown">
-            <NuxtLink
-              v-for="cat in categories"
-              :key="cat.slug"
-              :to="`/categoria/${cat.slug}`"
-              class="navbar-item"
-            >
-              {{ cat.name }}
-            </NuxtLink>
-          </div>
-        </div>
+      <span class="has-text-weight-bold is-size-5">MiTienda</span>
+    </NuxtLink>
 
+    <!-- Burger para móvil -->
+    <a role="button" class="navbar-burger" :class="{ 'is-active': showMenu }" aria-label="menu" aria-expanded="false" @click="showMenu = !showMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
 
-        <div v-if="isAdmin" class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">Panel Administrador</a>
-          <div class="navbar-dropdown">
-            <NuxtLink to="/admin/createProduct" class="navbar-item">Gestionar productos</NuxtLink>
-            <NuxtLink to="/admin/orders" class="navbar-item">Ver órdenes de compra</NuxtLink>
-          </div>
+  <!-- CENTRO: Menú -->
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      <!-- Categorías para usuarios -->
+      <div v-if="!isAdmin" class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link has-text-white">Categorías</a>
+        <div class="navbar-dropdown">
+          <NuxtLink
+            v-for="cat in categories"
+            :key="cat.slug"
+            :to="`/categoria/${cat.slug}`"
+            class="navbar-item"
+          >{{ cat.name }}</NuxtLink>
         </div>
       </div>
 
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="buttons">
-            <template v-if="!isLoggedIn">
-              <button class="button is-light" @click="showLogin = true">Iniciar Sesión</button>
-              <button class="button is-light" @click="showRegister = true">Registrarse</button>
-            </template>
-            <template v-else>
-              <button class="button is-light" @click="toggleCart">
-                Carrito ({{ cart.length }})
-              </button>
-              <button class="button is-light" @click="logout">Cerrar Sesión</button>
-            </template>
-          </div>
+      <!-- Panel admin -->
+      <div v-if="isAdmin" class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link has-text-white">Panel Administrador</a>
+        <div class="navbar-dropdown">
+          <NuxtLink to="/admin/createProduct" class="navbar-item">Gestionar productos</NuxtLink>
+          <NuxtLink to="/admin/orders" class="navbar-item">Ver órdenes de compra</NuxtLink>
         </div>
       </div>
     </div>
 
-    <!-- Modales -->
-    <CartModal
-      :is-active="showCart"
-      :cart="cart"
-      @close="showCart = false"
-      @update:cart="handleCartUpdate"
-      @checkout="handleCheckout"
-    />
-    <LoginModal v-model:is-active="showLogin" />
-    <RegisterModal v-model:is-active="showRegister" />
-  </nav>
+    <!-- DERECHA: botones -->
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+  <template v-if="!isLoggedIn">
+    <button class="button is-light is-rounded" @click="showLogin = true">Iniciar Sesión</button>
+    <button class="button is-light is-rounded" @click="showRegister = true">Registrarse</button>
+  </template>
+  <template v-else>
+    <!-- Botón Carrito con emoji -->
+    <button class="button is-info is-rounded has-text-white" @click="toggleCart">
+      🛒 Carrito ({{ cart.length }})
+    </button>
+
+    <!-- Botón Cerrar sesión con emoji -->
+    <button class="button is-danger is-rounded has-text-white" @click="logout">
+      🔓 Cerrar Sesión
+    </button>
+  </template>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales -->
+  <CartModal
+    :is-active="showCart"
+    :cart="cart"
+    @close="showCart = false"
+    @update:cart="handleCartUpdate"
+    @checkout="handleCheckout"
+  />
+  <LoginModal v-model:is-active="showLogin" />
+  <RegisterModal v-model:is-active="showRegister" />
+</nav>
 </template>

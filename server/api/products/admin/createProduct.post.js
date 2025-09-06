@@ -1,6 +1,7 @@
 import { createProduct } from "~~/server/services/productsServices";
 
 export default defineEventHandler(async (event) => {
+
     const body = await readBody(event);
 
     try {
