@@ -12,11 +12,15 @@
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "bulma": "^1.0.4",
+    "cloudinary": "^2.7.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-vue-next": "^0.543.0",
     "mercadopago": "^2.8.0",
     "mongodb": "^6.18.0",
     "mongoose": "^8.18.0",
     "nuxt": "^4.0.3",
+    "sweetalert2": "^11.23.0",
+    "vite-tsconfig-paths": "^5.1.4",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1",
     "vue3-pagination": "^1.0.16"

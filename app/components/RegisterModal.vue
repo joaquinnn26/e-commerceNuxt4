@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   isActive: { type: Boolean, default: false }
@@ -17,10 +18,20 @@ try {
       body: { email: email.value, password: password.value, name:name.value}
     })
 
-    res.message && alert(res.message)
+    if (res.message) {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: res.message
+      })
+    }
     emit('update:isActive', false)
   } catch (err) {
-    alert(err.statusMessage || 'Error en registro')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: err.statusMessage || 'Error en registro'
+    })
   }
   
 }
@@ -37,8 +48,8 @@ watch(() => props.isActive, active => {
   <div class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="emit('update:isActive', false)"></div>
     <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Registrarse</p>
+      <header class="modal-card-head" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <p class="modal-card-title has-text-white">Registrarse</p>
         <button class="delete" @click="emit('update:isActive', false)"></button>
       </header>
       <section class="modal-card-body">
@@ -62,7 +73,7 @@ watch(() => props.isActive, active => {
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-success" @click="handleRegister">Registrarse</button>
+        <button class="button" @click="handleRegister" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">Registrarse</button>
         <button class="button" @click="emit('update:isActive', false)">Cancelar</button>
       </footer>
     </div>

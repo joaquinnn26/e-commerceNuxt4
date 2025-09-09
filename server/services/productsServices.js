@@ -61,7 +61,7 @@ async function deleteProduct(id) {
 async function updateProduct(id, productData) {
     await connectDB();
 
-    const allowedFields = ['nombre', 'descripcion', 'precio', 'stock', 'imagen'];
+    const allowedFields = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria'];
     const updateData = {};
 
     for (const field of allowedFields) {

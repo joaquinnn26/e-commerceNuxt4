@@ -1,26 +1,28 @@
 <template>
-  <div class="bg-white shadow rounded-lg p-4">
-    <h2 class="text-lg font-bold mb-4">Productos</h2>
-    <table class="w-full border-collapse">
-      <thead>
-        <tr class="border-b">
-          <th class="p-2 text-left">Nombre</th>
-          <th class="p-2 text-left">Precio</th>
-          <th class="p-2 text-left">Stock</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr 
-          v-for="product in products" 
-          :key="product._id" 
-          :class="{ 'bg-red-100': product.stock < 5 }"
-        >
-          <td class="p-2">{{ product.nombre }}</td>
-          <td class="p-2">${{ product.precio }}</td>
-          <td class="p-2">{{ product.stock }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="box">
+    <h2 class="title is-5 mb-4">Productos</h2>
+    <div class="table-container">
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            v-for="product in products" 
+            :key="product._id" 
+            :class="{ 'has-background-danger-light': product.stock < 5 }"
+          >
+            <td>{{ product.nombre }}</td>
+            <td>${{ product.precio }}</td>
+            <td>{{ product.stock }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 

@@ -21,6 +21,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   show: Boolean
@@ -48,7 +49,11 @@ async function submit() {
     await fetchMe()
     emit('close')
   } catch (e) {
-    alert(e.message || 'Error al autenticarse')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: e.message || 'Error al autenticarse'
+    })
   }
 }
 </script>

@@ -1,4 +1,6 @@
 <script setup>
+import { Check } from 'lucide-vue-next'
+
 const props = defineProps({
   orders: Array
 })
@@ -16,32 +18,36 @@ const confirmOrder = async (id) => {
 </script>
 
 <template>
-  <div class="bg-white shadow rounded-lg p-4">
-    <h2 class="text-lg font-bold mb-4">Pedidos pendientes</h2>
-    <table class="w-full border-collapse">
-      <thead>
-        <tr class="border-b">
-          <th class="p-2 text-left">ID</th>
-          <th class="p-2 text-left">Cliente</th>
-          <th class="p-2 text-left">Total</th>
-          <th class="p-2 text-left">Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="order in orders" :key="order._id" class="border-b">
-          <td class="p-2">{{ order._id }}</td>
-          <td class="p-2">{{ order.customerName }}</td>
-          <td class="p-2">${{ order.total }}</td>
-          <td class="p-2">
-            <button 
-              class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-              @click="confirmOrder(order._id)"
-            >
-              Confirmar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="box">
+    <h2 class="title is-5 mb-4">Pedidos pendientes</h2>
+    <div class="table-container">
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Total</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="order in orders" :key="order._id">
+            <td>{{ order._id }}</td>
+            <td>{{ order.customerName }}</td>
+            <td>${{ order.total }}</td>
+            <td>
+              <button 
+                class="button is-small"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;"
+                @click="confirmOrder(order._id)"
+              >
+                <Check :size="14" class="mr-1" />
+                Confirmar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

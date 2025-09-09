@@ -1,6 +1,5 @@
 
 export default defineNuxtConfig({
-
   css: [
     'bulma/css/bulma.css'
   ],
@@ -14,3 +13,4 @@ export default defineNuxtConfig({
     JWT_SECRET: process.env.JWT_SECRET
   }
 })
+

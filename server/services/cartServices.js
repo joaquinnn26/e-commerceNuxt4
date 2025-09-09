@@ -34,12 +34,24 @@ async function addItemToCart(userId, productId, quantity) {
     if (!cart) {    
         throw createError({ statusCode: 404, statusMessage: 'Carrito no encontrado' });
     }   
+    const delta = Number.isFinite(Number(quantity)) ? Number(quantity) : 0;
+    if (delta === 0) {
+        return cart; // no changes for zero deltas
+    }
+
     const existingItemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
     if (existingItemIndex >= 0) {
-        cart.items[existingItemIndex].quantity += quantity;
-    } else {
-        cart.items.push({ productId, quantity });
-    }  
+        const nextQty = (cart.items[existingItemIndex].quantity || 0) + delta;
+        if (nextQty <= 0) {
+            // Remove the item if quantity would be zero or negative
+            cart.items.splice(existingItemIndex, 1);
+        } else {
+            cart.items[existingItemIndex].quantity = nextQty;
+        }
+    } else if (delta > 0) {
+        // Only add new item if positive quantity
+        cart.items.push({ productId, quantity: delta });
+    }
     await cart.save();
     return cart;
 }

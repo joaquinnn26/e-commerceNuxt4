@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
   isActive: { type: Boolean, default: false }
@@ -19,7 +20,6 @@ const handleLogin = async () => {
       body: { email: email.value, password: password.value }
     })
 
-    console.log('Respuesta del login:', res)
     // Guardar token en localStorage
       const userData = {
       id: res.id,
@@ -35,7 +35,11 @@ const handleLogin = async () => {
 
     location.reload()
   } catch (err) {
-    alert(err.statusMessage || 'Error en login')
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: err.statusMessage || 'Error en login'
+    })
   }
 }
 
@@ -54,8 +58,8 @@ watch(() => props.isActive, active => {
   <div  class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="emit('update:isActive', false)"></div>
     <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Iniciar Sesión</p>
+      <header class="modal-card-head" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <p class="modal-card-title has-text-white">Iniciar Sesión</p>
         <button class="delete" @click="emit('update:isActive', false)"></button>
       </header>
       <section class="modal-card-body">
@@ -73,7 +77,7 @@ watch(() => props.isActive, active => {
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-success" @click="handleLogin">Ingresar</button>
+        <button class="button" @click="handleLogin" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">Ingresar</button>
         <button class="button" @click="emit('update:isActive', false)">Cancelar</button>
       </footer>
     </div>

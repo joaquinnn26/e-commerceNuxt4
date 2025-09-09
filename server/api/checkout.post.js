@@ -42,7 +42,6 @@ export default defineEventHandler(async (event) => {
 
     /* const mockInitPoint = 'http://localhost:3000/payment/success'
 
-  console.log('Checkout mock items:', items)
 
   return { init_point: mockInitPoint } */
 })
