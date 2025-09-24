@@ -1,5 +1,5 @@
-import { connectDB } from '~~/server/utils/db.js'
-import Cart from '~~/server/models/cart.js'
+import { connectDB } from '../utils/db.js'
+import Cart from '../models/cart.js'
 
 
 

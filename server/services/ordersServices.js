@@ -1,5 +1,5 @@
 import order from "../models/order.js";
-import { connectDB } from '~~/server/utils/db.js';
+import { connectDB } from '../utils/db.js';
 
 
 export const createOrder = async (orderData) => {

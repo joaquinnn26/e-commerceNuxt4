@@ -1,4 +1,4 @@
-import { deleteOrder } from "~~/server/services/ordersServices.js";
+import { deleteOrder } from "../../services/ordersServices.js";
 
 export default defineEventHandler(async (event) => {
   const { orderId } = event.context.params;

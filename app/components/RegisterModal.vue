@@ -10,12 +10,13 @@ const emit = defineEmits(['update:isActive'])
 const email = ref('')
 const password = ref('')
 const name = ref('')
+const telefono = ref('')
 
 const handleRegister =async () => {
 try {
     const res= await $fetch('/api/auth/register', {
       method: 'POST',
-      body: { email: email.value, password: password.value, name:name.value}
+      body: { email: email.value, password: password.value, name:name.value, telefono:telefono.value}
     })
 
     if (res.message) {
@@ -48,7 +49,7 @@ watch(() => props.isActive, active => {
   <div class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="emit('update:isActive', false)"></div>
     <div class="modal-card">
-      <header class="modal-card-head" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <header class="modal-card-head" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));">
         <p class="modal-card-title has-text-white">Registrarse</p>
         <button class="delete" @click="emit('update:isActive', false)"></button>
       </header>
@@ -71,9 +72,15 @@ watch(() => props.isActive, active => {
             <input class="input" type="password" v-model="password" placeholder="Contraseña">
           </div>
         </div>
+        <div class="field">
+          <label class="label">Teléfono</label>
+          <div class="control">
+            <input class="input" type="text" v-model="telefono" placeholder="Teléfono">
+          </div>
+        </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" @click="handleRegister" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">Registrarse</button>
+        <button class="button" @click="handleRegister" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">Registrarse</button>
         <button class="button" @click="emit('update:isActive', false)">Cancelar</button>
       </footer>
     </div>

@@ -1,4 +1,4 @@
-import { getUserByEmail } from "~~/server/services/userServices.js";
+import { getUserByEmail } from "../../services/userServices.js";
 
 export default defineEventHandler(async (event) => {
   const { email } = event.context.params;

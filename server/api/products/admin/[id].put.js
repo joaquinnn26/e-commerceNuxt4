@@ -1,5 +1,5 @@
 
-import { updateProduct } from "~~/server/services/productsServices";
+import { updateProduct } from "../../../services/productsServices";
 
 export default defineEventHandler(async (event) => {
     try {

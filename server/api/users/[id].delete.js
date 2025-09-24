@@ -1,4 +1,4 @@
-import { deleteUser } from "~~/server/services/userServices.js";
+import { deleteUser } from "../../services/userServices.js";
 
 export default defineEventHandler(async (event) => {
 

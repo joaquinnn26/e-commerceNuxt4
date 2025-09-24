@@ -7,6 +7,7 @@ const ProductSchema = new mongoose.Schema({
   stock: { type: Number, required: true, default: 0 },
   imagen: { type: String },
   categoria: { type: String, required: true },
+  destacado: { type: Boolean, default: false }, // Campo para productos destacados
 }, { timestamps: true })
 
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema)

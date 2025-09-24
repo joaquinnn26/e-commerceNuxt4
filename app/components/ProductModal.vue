@@ -18,7 +18,7 @@ watch(() => props.modelValue, (newVal) => { localProduct.value = { ...newVal } }
 watch(() => props.isActive, (active) => {
   if (active) {
     if (props.mode === 'create') {
-      localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' }
+      localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' }
     } else {
       localProduct.value = { ...props.modelValue }
     }
@@ -30,7 +30,7 @@ watch(() => props.isActive, (active) => {
 watch(() => props.mode, (newMode) => {
   if (props.isActive) {
     if (newMode === 'create') {
-      localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' }
+      localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' }
     } else {
       localProduct.value = { ...props.modelValue }
     }
@@ -82,7 +82,7 @@ const save = async () => {
     // Resetear el estado después de guardar
     setTimeout(() => {
       if (props.mode === 'create') {
-        localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' }
+        localProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' }
       }
       selectedFile.value = null
       uploadError.value = null
@@ -97,7 +97,7 @@ const save = async () => {
   <div class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="emit('update:isActive', false)"></div>
     <div class="modal-card" style="max-width: 90vw; width: 500px; border-radius:10px;">
-      <header class="modal-card-head" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <header class="modal-card-head" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));">
         <p class="modal-card-title has-text-white">{{ mode === 'create' ? 'Crear' : 'Editar' }} Producto</p>
         <button class="delete" @click="emit('update:isActive', false)"></button>
       </header>
@@ -175,10 +175,25 @@ const save = async () => {
             <textarea class="textarea is-rounded" v-model="localProduct.descripcion" placeholder="Descripción"></textarea>
           </div>
         </div>
+
+        <!-- Producto Destacado -->
+        <div class="field">
+          <div class="control">
+            <label class="checkbox">
+              <input type="checkbox" v-model="localProduct.destacado">
+              <span class="ml-2 has-text-weight-semibold">
+                ⭐ Marcar como producto destacado
+              </span>
+            </label>
+            <p class="help is-info">
+              Los productos destacados aparecerán en el carrusel de la página principal
+            </p>
+          </div>
+        </div>
       </section>
 
       <footer class="modal-card-foot is-justify-content-space-between is-flex-wrap-wrap">
-        <button class="button is-rounded mb-2" @click="save" :disabled="uploading" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <button class="button is-rounded mb-2" @click="save" :disabled="uploading" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
           {{ uploading ? 'Subiendo...' : 'Guardar' }}
         </button>
         <button class="button is-light is-rounded mb-2" @click="emit('update:isActive', false)" :disabled="uploading">Cancelar</button>

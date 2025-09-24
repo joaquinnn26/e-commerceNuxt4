@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
-import {connectDB} from '~~/server/utils/db.js'
-import User from '~~/server/models/Users.js'
+import {connectDB} from '../../utils/db.js'
+import User from '../../models/Users.js'
 
 export default defineEventHandler(async (event) => {
   await connectDB()

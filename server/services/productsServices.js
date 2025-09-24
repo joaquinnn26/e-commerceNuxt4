@@ -1,5 +1,5 @@
-import { connectDB } from '~~/server/utils/db.js';
-import Product from '~~/server/models/products.js';
+import { connectDB } from '../utils/db.js';
+import Product from '../models/products.js';
  
 
 
@@ -40,11 +40,11 @@ export const getPaginatedProducts = async (page = 1, limit = 8, category = null,
 };
 async function createProduct(producto) {
     await connectDB();
-    const { nombre, descripcion, precio, stock, imagen, categoria } = producto;
+    const { nombre, descripcion, precio, stock, imagen, categoria, destacado } = producto;
     if (!nombre || !descripcion || !precio || !stock || !imagen || !categoria) {
         throw createError({ statusCode: 400, statusMessage: 'Todos los campos son obligatorios' });
     }
-    const newProduct = await Product.create({ nombre, descripcion, precio, stock, imagen, categoria });
+    const newProduct = await Product.create({ nombre, descripcion, precio, stock, imagen, categoria, destacado: destacado || false });
     return newProduct;  
 
 }
@@ -61,7 +61,7 @@ async function deleteProduct(id) {
 async function updateProduct(id, productData) {
     await connectDB();
 
-    const allowedFields = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria'];
+    const allowedFields = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'categoria', 'destacado'];
     const updateData = {};
 
     for (const field of allowedFields) {

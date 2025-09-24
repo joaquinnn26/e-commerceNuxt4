@@ -1,4 +1,4 @@
-import { getAllOrders } from "~~/server/services/ordersServices.js";
+import { getAllOrders } from "../../services/ordersServices.js";
 
 export default defineEventHandler(async (event) => {
     try {

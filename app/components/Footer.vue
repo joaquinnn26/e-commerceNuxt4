@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <footer class="footer has-text-white-ter" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<footer class="footer has-text-white-ter" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <div class="container">
       <div class="columns is-mobile is-vcentered">
         <!-- Información básica -->

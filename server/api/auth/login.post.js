@@ -1,6 +1,6 @@
-import { getUserByEmail } from '~~/server/services/userServices.js'
+import { getUserByEmail } from '../../services/userServices.js'
 import bcrypt from 'bcryptjs'
-import { signToken } from '~~/server/utils/jwt.js'
+import { signToken } from '../../utils/jwt.js'
 
 export default defineEventHandler(async (event) => {
   const { email, password } = await readBody(event)

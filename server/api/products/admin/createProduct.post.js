@@ -1,4 +1,4 @@
-import { createProduct } from "~~/server/services/productsServices";
+import { createProduct } from "../../../services/productsServices";
 
 export default defineEventHandler(async (event) => {
 

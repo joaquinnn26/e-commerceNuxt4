@@ -1,4 +1,4 @@
-import { createUser } from "~~/server/services/userServices.js";
+import { createUser } from "../../services/userServices.js";
 
 export default defineEventHandler(async (event) => {
     try {

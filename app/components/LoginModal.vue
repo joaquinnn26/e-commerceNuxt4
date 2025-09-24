@@ -58,7 +58,7 @@ watch(() => props.isActive, active => {
   <div  class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="emit('update:isActive', false)"></div>
     <div class="modal-card">
-      <header class="modal-card-head" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <header class="modal-card-head" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));">
         <p class="modal-card-title has-text-white">Iniciar Sesión</p>
         <button class="delete" @click="emit('update:isActive', false)"></button>
       </header>
@@ -77,7 +77,7 @@ watch(() => props.isActive, active => {
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" @click="handleLogin" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">Ingresar</button>
+        <button class="button" @click="handleLogin" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">Ingresar</button>
         <button class="button" @click="emit('update:isActive', false)">Cancelar</button>
       </footer>
     </div>

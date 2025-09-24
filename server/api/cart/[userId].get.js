@@ -1,4 +1,4 @@
-import { getCartByUserId } from '~~/server/services/cartServices.js';
+import { getCartByUserId } from '../../services/cartServices.js';
 
 export default defineEventHandler(async (event) => {
   const { userId } = event.context.params;

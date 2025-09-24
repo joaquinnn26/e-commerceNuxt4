@@ -50,13 +50,13 @@ onMounted(() => {
     <div class="container">
       <!-- Seguir comprando: top-left en desktop, centrado en mobile -->
       <div class="is-hidden-mobile mb-4">
-        <NuxtLink to="/" class="button is-light is-rounded" style="margin: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <NuxtLink to="/" class="button is-light is-rounded" style="margin: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
           <ArrowLeft :size="18" class="mr-2" />
           Seguir comprando
         </NuxtLink>
       </div>
       <div class="is-hidden-tablet has-text-centered mb-4">
-        <NuxtLink to="/" class="button is-light is-rounded" style="margin: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+        <NuxtLink to="/" class="button is-light is-rounded" style="margin: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
           <ArrowLeft :size="18" class="mr-2" />
           Seguir comprando
         </NuxtLink>
@@ -85,7 +85,7 @@ onMounted(() => {
             <!-- Selector cantidad -->
             <div class="field has-addons mt-4" style="max-width: 220px; margin: 0 auto;">
               <p class="control">
-                <button class="button" @click="decrement" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <button class="button" @click="decrement" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
                   <Minus :size="16" />
                 </button>
               </p>
@@ -93,7 +93,7 @@ onMounted(() => {
                 <input class="input has-text-centered" type="number" min="1" max="99" v-model.number="quantity">
               </p>
               <p class="control">
-                <button class="button" @click="increment" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <button class="button" @click="increment" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
                   <Plus :size="16" />
                 </button>
               </p>
@@ -104,7 +104,7 @@ onMounted(() => {
             </p>
 
             <div class="is-flex is-flex-wrap-wrap is-justify-content-center mt-3" style="gap: 0.75rem;">
-              <button class="button is-medium" @click="addCurrentToCart" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+              <button class="button is-medium" @click="addCurrentToCart" style="background: linear-gradient(135deg, var(--primary-600), var(--secondary-600)); color: white; border: none;">
                 <ShoppingCart :size="18" class="mr-2" />
                 Agregar al carrito
               </button>

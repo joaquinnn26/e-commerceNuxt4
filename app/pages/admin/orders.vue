@@ -102,7 +102,7 @@ definePageMeta({
             <td>{{  order.userId.email }}</td>
             <td>
               <ul>
-                <li v-for="item in order.items" :key="item.productId">{{ item.productId?.nombre || 'Producto eliminado' }} x {{ item.quantity }}</li>
+                <li v-for="item in order.items" :key="item.productId">{{ item.productName || item.productId?.nombre || 'Producto eliminado' }} x {{ item.quantity }}</li>
               </ul>
             </td>
             <td>{{ currency(order.total) }}</td>
@@ -143,7 +143,7 @@ definePageMeta({
         </div>
         <p class="is-size-7 has-text-grey">Usuario: {{ order.userId.email }}</p>
         <ul class="mt-2" style="list-style: disc; padding-left: 1rem;">
-          <li class="is-size-7" v-for="item in order.items" :key="item.productId">{{ item.productId?.nombre || 'Producto eliminado' }} x {{ item.quantity }}</li>
+          <li class="is-size-7" v-for="item in order.items" :key="item.productId">{{ item.productName || item.productId?.nombre || 'Producto eliminado' }} x {{ item.quantity }}</li>
         </ul>
         <div class="is-flex is-justify-content-space-between is-align-items-center mt-3">
           <span class="has-text-weight-semibold">Total: {{ currency(order.total) }}</span>

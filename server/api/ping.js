@@ -1,4 +1,4 @@
-import {connectDB} from '~~/server/utils/db.js'
+import {connectDB} from '../utils/db.js'
 
 export default defineEventHandler(async () => {
   try {

@@ -1,4 +1,4 @@
-import { deleteProduct } from "~~/server/services/productsServices";
+import { deleteProduct } from "../../../services/productsServices";
 
 export default defineEventHandler(async (event) => {
 

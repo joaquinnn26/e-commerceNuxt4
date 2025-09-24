@@ -7,7 +7,7 @@ import { Settings, PlusCircle, Edit, Trash2 } from 'lucide-vue-next'
 const products = ref([])
 const showModal = ref(false)
 const modalMode = ref('create')
-const currentProduct = ref({ nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' })
+const currentProduct = ref({ nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' })
 const expandedDescriptions = ref({})
 let token = ref(null)
 
@@ -53,7 +53,7 @@ const saveProduct = async (product) => {
     // Cerrar modal y resetear estado
     showModal.value = false
     modalMode.value = 'create'
-    currentProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' }
+    currentProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' }
     
     await fetchProducts()
   } catch (err) {
@@ -75,7 +75,7 @@ const editProduct = (prod) => {
 // Crear producto
 const createProduct = () => {
   // Resetear completamente el estado
-  currentProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', _id: '' }
+  currentProduct.value = { nombre: '', precio: 0, descripcion: '', stock: 0, imagen: '', categoria: '', destacado: false, _id: '' }
   modalMode.value = 'create'
   showModal.value = true
 }
@@ -135,7 +135,7 @@ onMounted(() => {
         </h1>
         <p class="subtitle is-5 has-text-grey">Gestiona tu inventario de productos</p>
       </div>
-      <button class="button mb-4" @click="createProduct" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+      <button class="button mb-4" @click="createProduct" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white; border: none;">
         <PlusCircle :size="18" class="mr-2" />
         Crear Producto
       </button>
@@ -150,6 +150,7 @@ onMounted(() => {
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Categoria</th>
+                <th>Destacado</th>
                 <th>Descripción</th>
                 <th>Acciones</th>
               </tr>
@@ -162,6 +163,14 @@ onMounted(() => {
                 <td>{{ prod.nombre }}</td>
                 <td>{{ prod.precio }}</td>
                 <td>{{ prod.categoria }}</td>
+                <td>
+                  <span 
+                    class="tag" 
+                    :class="prod.destacado ? 'is-success' : 'is-light'"
+                  >
+                    {{ prod.destacado ? '⭐ Destacado' : 'Normal' }}
+                  </span>
+                </td>
                 <td class="is-clipped" style="max-width: 240px;">
                   <span v-if="!expandedDescriptions[prod._id]">
                     {{ getTruncatedDescription(prod.descripcion) }}
@@ -169,7 +178,7 @@ onMounted(() => {
                       v-if="isDescriptionLong(prod.descripcion)" 
                       class="button is-small is-text is-paddingless ml-1" 
                       @click="toggleDescription(prod._id)"
-                      style="color: #667eea; text-decoration: underline;"
+                      style="color: var(--primary-600); text-decoration: underline;"
                     >
                       Ver más
                     </button>
@@ -179,14 +188,14 @@ onMounted(() => {
                     <button 
                       class="button is-small is-text is-paddingless ml-1" 
                       @click="toggleDescription(prod._id)"
-                      style="color: #667eea; text-decoration: underline;"
+                      style="color: var(--primary-600); text-decoration: underline;"
                     >
                       Ver menos
                     </button>
                   </span>
                 </td>
                 <td>
-                  <button class="button is-small mr-2 mb-2" @click="editProduct(prod)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                  <button class="button is-small mr-2 mb-2" @click="editProduct(prod)" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white; border: none;">
                     <Edit :size="14" class="mr-1" />
                     Editar
                   </button>
@@ -197,7 +206,7 @@ onMounted(() => {
                 </td>
               </tr>
               <tr v-if="products.length === 0">
-                <td colspan="6" class="has-text-centered">No hay productos disponibles</td>
+                <td colspan="7" class="has-text-centered">No hay productos disponibles</td>
               </tr>
             </tbody>
           </table>
@@ -213,6 +222,12 @@ onMounted(() => {
               <h3 class="title is-6 mb-1">{{ prod.nombre }}</h3>
               <p class="has-text-weight-semibold has-text-primary">$ {{ prod.precio }}</p>
               <p class="is-size-7 has-text-grey">{{ prod.categoria }}</p>
+              <span 
+                class="tag is-small" 
+                :class="prod.destacado ? 'is-success' : 'is-light'"
+              >
+                {{ prod.destacado ? '⭐ Destacado' : 'Normal' }}
+              </span>
             </div>
           </div>
           
@@ -224,7 +239,7 @@ onMounted(() => {
                   v-if="isDescriptionLong(prod.descripcion, 80)" 
                   class="button is-small is-text is-paddingless ml-1" 
                   @click="toggleDescription(prod._id)"
-                  style="color: #667eea; text-decoration: underline;"
+                  style="color: var(--primary-600); text-decoration: underline;"
                 >
                   Ver más
                 </button>
@@ -234,7 +249,7 @@ onMounted(() => {
                 <button 
                   class="button is-small is-text is-paddingless ml-1" 
                   @click="toggleDescription(prod._id)"
-                  style="color: #667eea; text-decoration: underline;"
+                  style="color: var(--primary-600); text-decoration: underline;"
                 >
                   Ver menos
                 </button>
@@ -243,7 +258,7 @@ onMounted(() => {
           </div>
 
           <div class="is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
-            <button class="button is-small" @click="editProduct(prod)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+            <button class="button is-small" @click="editProduct(prod)" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white; border: none;">
               <Edit :size="14" class="mr-1" />
               Editar
             </button>

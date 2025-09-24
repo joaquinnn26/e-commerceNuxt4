@@ -1,4 +1,4 @@
-import { getProductById } from "~~/server/services/productsServices";
+import { getProductById } from "../../services/productsServices";
 
 
 export default defineEventHandler(async (event) => {

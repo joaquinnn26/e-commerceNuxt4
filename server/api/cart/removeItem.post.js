@@ -1,4 +1,4 @@
-import { removeItemFromCart } from "~~/server/services/cartServices.js";
+import { removeItemFromCart } from "../../services/cartServices.js";
 
 
 export default defineEventHandler(async (event) => {
