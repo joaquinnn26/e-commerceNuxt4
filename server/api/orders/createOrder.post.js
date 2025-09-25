@@ -43,12 +43,11 @@ export default defineEventHandler(async (event) => {
 
     // Devolver la orden con productos y usuario populados
     const populatedOrder = await Order.findById(newOrder._id)
-      .populate("userId", "nombre email"); // no necesitamos popular product para mostrar nombre
+      .populate("userId", "name email telefono"); // incluir telefono
 
     return populatedOrder;
 
   } catch (error) {
-    console.error(error);
     throw createError({
       statusCode: 500,
       statusMessage: "Error al crear la orden",

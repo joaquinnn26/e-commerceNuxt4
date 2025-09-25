@@ -10,8 +10,8 @@ export default defineNuxtConfig({
     public: {
       numeroVendedor: process.env.NUXT_PUBLIC_NUMERO_VENDEDOR
     },
-    MONGO_URI: process.env.MONGO_URI,
-    JWT_SECRET: process.env.JWT_SECRET
+    MONGO_URI:process.env.MONGO_URI,
+    JWT_SECRET:process.env.JWT_SECRET
   }
 })
 

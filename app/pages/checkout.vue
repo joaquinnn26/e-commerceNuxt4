@@ -21,7 +21,82 @@ const envio = ref({
   provincia: ''
 })
 
+const errors = ref({})
+const isSubmitting = ref(false)
+
+const validateForm = () => {
+  errors.value = {}
+  
+  // Validar nombre
+  if (!envio.value.nombre.trim()) {
+    errors.value.nombre = 'El nombre es requerido'
+  } else if (envio.value.nombre.trim().length < 2) {
+    errors.value.nombre = 'El nombre debe tener al menos 2 caracteres'
+  }
+  
+  // Validar dirección
+  if (!envio.value.direccion.trim()) {
+    errors.value.direccion = 'La dirección es requerida'
+  } else if (envio.value.direccion.trim().length < 5) {
+    errors.value.direccion = 'La dirección debe tener al menos 5 caracteres'
+  }
+  
+  // Validar localidad
+  if (!envio.value.localidad.trim()) {
+    errors.value.localidad = 'La localidad es requerida'
+  } else if (envio.value.localidad.trim().length < 2) {
+    errors.value.localidad = 'La localidad debe tener al menos 2 caracteres'
+  }
+  
+  // Validar código postal
+  if (!envio.value.codigoPostal.trim()) {
+    errors.value.codigoPostal = 'El código postal es requerido'
+  } else if (!/^[0-9]{4,8}$/.test(envio.value.codigoPostal.trim())) {
+    errors.value.codigoPostal = 'El código postal debe contener solo números (4-8 dígitos)'
+  }
+  
+  // Validar ciudad
+  if (!envio.value.ciudad.trim()) {
+    errors.value.ciudad = 'La ciudad es requerida'
+  } else if (envio.value.ciudad.trim().length < 2) {
+    errors.value.ciudad = 'La ciudad debe tener al menos 2 caracteres'
+  }
+  
+  // Validar provincia
+  if (!envio.value.provincia.trim()) {
+    errors.value.provincia = 'La provincia es requerida'
+  } else if (envio.value.provincia.trim().length < 2) {
+    errors.value.provincia = 'La provincia debe tener al menos 2 caracteres'
+  }
+  
+  return Object.keys(errors.value).length === 0
+}
+
 const finalizarCompra = async () => {
+  if (isSubmitting.value) return
+  
+  // Validar formulario
+  if (!validateForm()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Formulario incompleto',
+      text: 'Por favor corrige los errores en el formulario antes de continuar'
+    })
+    return
+  }
+
+  // Validar carrito
+  if (cart.value.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Carrito vacío',
+      text: 'El carrito está vacío.'
+    })
+    return
+  }
+
+  isSubmitting.value = true
+
   const config = useRuntimeConfig()
   const numeroVendedor = config.public.numeroVendedor
 
@@ -32,31 +107,9 @@ const finalizarCompra = async () => {
       title: 'Acceso requerido',
       text: 'Debes iniciar sesión para continuar'
     })
+    isSubmitting.value = false
     return
   }
-
-  const camposVacios = Object.entries(envio.value)
-    .filter(([key, value]) => value.trim() === "")
-    .map(([key]) => key)
-
-  if (camposVacios.length > 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Campos incompletos',
-      text: `Por favor completa los siguientes campos: ${camposVacios.join(", ")}`
-    })
-    return
-  }
-
-  if (cart.value.length === 0) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Carrito vacío',
-      text: 'El carrito está vacío.'
-    })
-    return
-  }
-
 
   try {
     await $fetch("/api/orders/createOrder", {
@@ -77,9 +130,9 @@ const finalizarCompra = async () => {
       title: 'Error',
       text: error.message || "Error al crear la orden en la base de datos"
     })
+    isSubmitting.value = false
     return
   }
-
 
   let detalleProductos = cart.value
     .map(
@@ -102,6 +155,8 @@ Provincia: ${envio.value.provincia}
   // 3️⃣ Abrir WhatsApp
   let url = `https://wa.me/${numeroVendedor}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
+  
+  isSubmitting.value = false
 };
 
 
@@ -200,38 +255,103 @@ const total = computed(() =>
             </h2>
             
             <div class="field">
-              <label class="label">Nombre completo</label>
+              <label class="label">Nombre completo *</label>
               <div class="control has-icons-left">
-                <input v-model="envio.nombre" type="text" placeholder="Tu nombre completo" class="input" required />
+                <input 
+                  v-model="envio.nombre" 
+                  type="text" 
+                  placeholder="Tu nombre completo" 
+                  class="input"
+                  :class="{ 'is-error': errors.nombre }"
+                  required 
+                />
                 <span class="icon is-small is-left">
                   <User :size="16" />
                 </span>
               </div>
+              <p v-if="errors.nombre" class="help is-error">{{ errors.nombre }}</p>
             </div>
 
             <div class="field">
-              <label class="label">Dirección</label>
-              <input v-model="envio.direccion" type="text" placeholder="Calle, número, piso, depto" class="input" required />
+              <label class="label">Dirección *</label>
+              <div class="control">
+                <input 
+                  v-model="envio.direccion" 
+                  type="text" 
+                  placeholder="Calle, número, piso, depto" 
+                  class="input"
+                  :class="{ 'is-error': errors.direccion }"
+                  required 
+                />
+              </div>
+              <p v-if="errors.direccion" class="help is-error">{{ errors.direccion }}</p>
             </div>
 
             <div class="field">
-              <label class="label">Localidad</label>
-              <input v-model="envio.localidad" type="text" placeholder="Localidad" class="input" required />
+              <label class="label">Localidad *</label>
+              <div class="control">
+                <input 
+                  v-model="envio.localidad" 
+                  type="text" 
+                  placeholder="Localidad" 
+                  class="input"
+                  :class="{ 'is-error': errors.localidad }"
+                  required 
+                />
+              </div>
+              <p v-if="errors.localidad" class="help is-error">{{ errors.localidad }}</p>
             </div>
 
             <div class="field">
-              <label class="label">Código Postal</label>
-              <input v-model="envio.codigoPostal" type="text" placeholder="Código Postal" class="input" required />
+              <label class="label">Código Postal *</label>
+              <div class="control">
+                <input 
+                  v-model="envio.codigoPostal" 
+                  type="text" 
+                  placeholder="Ej: 1234" 
+                  class="input"
+                  :class="{ 'is-error': errors.codigoPostal }"
+                  maxlength="8"
+                  required 
+                />
+              </div>
+              <p v-if="errors.codigoPostal" class="help is-error">{{ errors.codigoPostal }}</p>
             </div>
 
             <div class="field">
-              <label class="label">Ciudad</label>
-              <input v-model="envio.ciudad" type="text" placeholder="Ciudad" class="input" required />
+              <label class="label">Ciudad *</label>
+              <div class="control">
+                <input 
+                  v-model="envio.ciudad" 
+                  type="text" 
+                  placeholder="Ciudad" 
+                  class="input"
+                  :class="{ 'is-error': errors.ciudad }"
+                  required 
+                />
+              </div>
+              <p v-if="errors.ciudad" class="help is-error">{{ errors.ciudad }}</p>
             </div>
 
             <div class="field">
-              <label class="label">Provincia</label>
-              <input v-model="envio.provincia" type="text" placeholder="Provincia" class="input" required />
+              <label class="label">Provincia *</label>
+              <div class="control">
+                <input 
+                  v-model="envio.provincia" 
+                  type="text" 
+                  placeholder="Provincia" 
+                  class="input"
+                  :class="{ 'is-error': errors.provincia }"
+                  required 
+                />
+              </div>
+              <p v-if="errors.provincia" class="help is-error">{{ errors.provincia }}</p>
+            </div>
+
+            <div class="field">
+              <p class="help is-info">
+                <strong>*</strong> Campos obligatorios
+              </p>
             </div>
 
             <div class="box has-background-light">
@@ -243,11 +363,13 @@ const total = computed(() =>
 
             <button 
               class="button is-fullwidth mt-4"
+              :class="{ 'is-loading': isSubmitting }"
+              :disabled="isSubmitting"
               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;"
               @click="finalizarCompra"
             >
               <MessageCircle :size="18" class="mr-2" />
-              Finalizar Compra via WhatsApp
+              {{ isSubmitting ? 'Procesando...' : 'Finalizar Compra via WhatsApp' }}
             </button>
           </div>
         </div>

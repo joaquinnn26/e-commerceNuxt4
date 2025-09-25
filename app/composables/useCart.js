@@ -12,7 +12,7 @@ export const useCart = () => {
     const user = JSON.parse(userString)
     if (user.id) userId.value = user.id // ✅ solo el ObjectId
   } catch (err) {
-    console.error('Error parsing user from localStorage', err)
+    // Error silencioso - usuario no válido en localStorage
   }
   }
 

@@ -21,15 +21,35 @@ const categories = ref([
   { name: 'Hogar', slug: 'hogar' }
 ])
 
-// Dividir productos destacados en chunks de 4 para el carrusel
-const featuredProductsChunks = computed(() => {
-  const chunks = []
-  for (let i = 0; i < featuredProducts.value.length; i += 4) {
-    chunks.push(featuredProducts.value.slice(i, i + 4))
+// Nuevo carrusel simple
+const currentSlideIndex = ref(0)
+const slideWidth = ref(100) // Porcentaje de ancho por slide
+const productsPerSlide = ref(1) // Productos por slide
+
+// Computed para crear slides con múltiples productos
+const slides = computed(() => {
+  if (featuredProducts.value.length === 0) return []
+  
+  const result = []
+  for (let i = 0; i < featuredProducts.value.length; i += productsPerSlide.value) {
+    result.push(featuredProducts.value.slice(i, i + productsPerSlide.value))
   }
-  console.log('Chunks del carrusel:', chunks.length, chunks)
-  return chunks
+  return result
 })
+
+// Función para actualizar productos por slide según el tamaño de pantalla
+const updateProductsPerSlide = () => {
+  if (window.innerWidth >= 1200) {
+    productsPerSlide.value = 3
+    slideWidth.value = 33.333
+  } else if (window.innerWidth >= 1024) {
+    productsPerSlide.value = 2
+    slideWidth.value = 50
+  } else {
+    productsPerSlide.value = 1
+    slideWidth.value = 100
+  }
+}
 
 const fetchProducts = async (page = 1) => {
   try {
@@ -41,11 +61,10 @@ const fetchProducts = async (page = 1) => {
     })
     const res = await $fetch(`/api/products/paginated?${query}`)
     products.value = res.data
-    totalPages.value = Number(res.totalPages)
-    currentPage.value = Number(res.currentPage)
+    totalPages.value = Number(res.pagination.totalPages)
+    currentPage.value = Number(res.pagination.currentPage)
     noResults.value = res.data.length === 0
   } catch (err) {
-    console.error('Error al cargar productos:', err)
     products.value = []
     noResults.value = true
   }
@@ -55,42 +74,40 @@ const fetchFeaturedProducts = async () => {
   try {
     const res = await $fetch('/api/products/featured')
     featuredProducts.value = res
-    console.log('Productos destacados cargados:', res.length, res)
   } catch (err) {
-    console.error('Error al cargar productos destacados:', err)
     featuredProducts.value = []
   }
 }
 
-// Controles del carrusel
+// Controles del nuevo carrusel
 const nextSlide = () => {
-  if (currentSlide.value < featuredProductsChunks.value.length - 1) {
-    currentSlide.value++
+  if (currentSlideIndex.value < slides.value.length - 1) {
+    currentSlideIndex.value++
+  } else {
+    currentSlideIndex.value = 0
   }
 }
 
 const prevSlide = () => {
-  if (currentSlide.value > 0) {
-    currentSlide.value--
+  if (currentSlideIndex.value > 0) {
+    currentSlideIndex.value--
+  } else {
+    currentSlideIndex.value = slides.value.length - 1
   }
 }
 
 const goToSlide = (index) => {
-  currentSlide.value = index
+  currentSlideIndex.value = index
 }
 
 // Auto-play del carrusel
 let carouselInterval = null
 
 const startCarousel = () => {
-  if (featuredProductsChunks.value.length > 1) {
+  if (slides.value.length > 1) {
     carouselInterval = setInterval(() => {
-      if (currentSlide.value === featuredProductsChunks.value.length - 1) {
-        currentSlide.value = 0
-      } else {
-        currentSlide.value++
-      }
-    }, 5000) // Cambia cada 5 segundos
+      nextSlide()
+    }, 4000) // Cambia cada 4 segundos
   }
 }
 
@@ -108,26 +125,23 @@ const goToPage = (page) => {
   fetchProducts(page)
 }
 
+
 onMounted(async () => {
   setUserFromStorage()
   fetchCart()
   fetchProducts()
   await fetchFeaturedProducts()
-  currentSlide.value = 0
+  updateProductsPerSlide()
+  currentSlideIndex.value = 0
   startCarousel()
+  
+  // Listener para cambios de tamaño de pantalla
+  window.addEventListener('resize', updateProductsPerSlide)
 })
 
 onUnmounted(() => {
   stopCarousel()
-})
-
-// Reiniciar autoplay cuando cambien los destacados (por ejemplo, después de cargarlos)
-watch(featuredProductsChunks, (chunks) => {
-  currentSlide.value = 0
-  stopCarousel()
-  if (chunks.length > 0) {
-    startCarousel()
-  }
+  window.removeEventListener('resize', updateProductsPerSlide)
 })
 </script>
 <template>
@@ -145,8 +159,8 @@ watch(featuredProductsChunks, (chunks) => {
       </div>
     </section>
 
-    <!-- Productos Destacados - Carrusel Renovado -->
-    <section class="section fp-section">
+    <!-- Productos Destacados - Nuevo Carrusel -->
+    <section class="section featured-section">
       <div class="container">
         <div class="has-text-centered mb-6">
           <h2 class="title is-size-4-mobile is-size-3-tablet text-gradient">Productos Destacados</h2>
@@ -157,30 +171,42 @@ watch(featuredProductsChunks, (chunks) => {
           <p>¡Pronto tendremos productos especiales para ti! Mantente atento a nuestras novedades.</p>
         </div>
 
-        <div v-else class="fp-slider">
-          <div class="fp-viewport">
-            <div class="fp-track" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-              <div class="fp-slide" v-for="(chunk, index) in featuredProductsChunks" :key="index">
-                <div class="fp-grid">
-                  <div class="fp-item" v-for="product in chunk" :key="product._id">
-                    <div class="fp-card">
-                      <div class="fp-img">
-                        <img :src="product.imagen" :alt="product.nombre" loading="lazy" />
-                        <span class="fp-badge">Destacado</span>
-                        <span v-if="product.stock === 0" class="tag is-danger" style="position:absolute; top:10px; right:10px;">Sin stock</span>
-                      </div>
-                      <div class="fp-info">
-                        <h3 class="fp-title">{{ product.nombre }}</h3>
-                        <p class="fp-price">${{ product.precio }}</p>
-                        <p class="fp-desc">{{ product.descripcion.substring(0, 54) }}...</p>
-                        <div class="fp-actions">
-                          <NuxtLink :to="`/product/${product._id}`" class="button is-light is-small">Ver</NuxtLink>
-                          <button 
-                            class="button is-primary is-small" 
-                            :disabled="product.stock === 0"
-                            @click="product.stock === 0 ? null : addToCart(product._id)"
-                          >{{ product.stock === 0 ? 'Sin stock' : 'Añadir' }}</button>
-                        </div>
+        <div v-else class="new-carousel">
+          <div class="carousel-container">
+            <div class="carousel-track" :style="{ transform: `translateX(-${currentSlideIndex * slideWidth}%)` }">
+              <div 
+                class="carousel-slide" 
+                v-for="(slideProducts, slideIndex) in slides" 
+                :key="slideIndex"
+              >
+                <div class="products-grid">
+                  <div 
+                    class="product-card" 
+                    v-for="product in slideProducts" 
+                    :key="product._id"
+                  >
+                    <div class="product-image">
+                      <img :src="product.imagen" :alt="product.nombre" loading="lazy" />
+                      <span class="product-badge">Destacado</span>
+                      <span v-if="product.stock === 0" class="tag is-danger stock-badge">Sin stock</span>
+                    </div>
+                    <div class="product-info">
+                      <h3 class="product-title">{{ product.nombre }}</h3>
+                      <p class="product-price">${{ product.precio }}</p>
+                      <p class="product-description">{{ product.descripcion.substring(0, 80) }}...</p>
+                      <div class="product-actions">
+                        <NuxtLink :to="`/product/${product._id}`" class="btn-view-carousel">
+                          <Eye :size="16" />
+                          Ver detalles
+                        </NuxtLink>
+                        <button 
+                          class="btn-cart-carousel"
+                          :disabled="product.stock === 0"
+                          @click="product.stock === 0 ? null : addToCart(product._id)"
+                        >
+                          <ShoppingCart :size="16" />
+                          {{ product.stock === 0 ? 'Sin stock' : 'Agregar' }}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -189,52 +215,59 @@ watch(featuredProductsChunks, (chunks) => {
             </div>
           </div>
 
-          <button class="fp-nav fp-prev" @click="prevSlide" :disabled="currentSlide === 0" v-if="featuredProductsChunks.length > 1">
+          <!-- Controles de navegación -->
+          <button 
+            class="carousel-btn prev-btn" 
+            @click="prevSlide" 
+            v-if="slides.length > 1"
+          >
             <ChevronLeft :size="20" />
           </button>
-          <button class="fp-nav fp-next" @click="nextSlide" :disabled="currentSlide === featuredProductsChunks.length - 1" v-if="featuredProductsChunks.length > 1">
+          <button 
+            class="carousel-btn next-btn" 
+            @click="nextSlide" 
+            v-if="slides.length > 1"
+          >
             <ChevronRight :size="20" />
           </button>
 
-          <div class="fp-dots" v-if="featuredProductsChunks.length > 1">
-            <button v-for="(chunk, index) in featuredProductsChunks" :key="index" class="fp-dot" :class="{ 'is-active': currentSlide === index }" @click="goToSlide(index)"></button>
+          <!-- Indicadores -->
+          <div class="carousel-indicators" v-if="slides.length > 1">
+            <button 
+              v-for="(slide, index) in slides" 
+              :key="index" 
+              class="carousel-indicator" 
+              :class="{ 'is-active': currentSlideIndex === index }" 
+              @click="goToSlide(index)"
+            ></button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Sección de Productos con Búsqueda -->
-    <section class="section" style="background-color: #f8f9fa;">
+    <!-- Sección de Productos Simplificada -->
+    <section class="products-section-simple">
       <div class="container">
-        <div class="has-text-centered mb-6">
-          <h2 class="title is-size-4-mobile is-size-3-tablet text-gradient">
-            Nuestros Productos
-          </h2>
-          <p class="subtitle is-5 has-text-grey">Los mejores productos al mejor precio</p>
+        <!-- Header simple -->
+        <div class="products-header-simple">
+          <h2 class="section-title-simple">Nuestros Productos</h2>
+          <p class="section-subtitle-simple">Los mejores productos al mejor precio</p>
         </div>
 
-        <!-- Barra de búsqueda y filtro de categoría -->
-        <div class="field is-grouped is-grouped-multiline mb-4 is-flex-direction-column-mobile">
-          <div class="control is-expanded mb-2-mobile">
-            <div class="field has-addons">
-              <div class="control is-expanded">
-                <input 
-                  class="input is-fullwidth" 
-                  type="text" 
-                  placeholder="Buscar productos por nombre..." 
-                  v-model="searchTerm"
-                />
-              </div>
-              <div class="control">
-                <button class="button is-static">
-                  <Search :size="18" />
-                </button>
-              </div>
+        <!-- Barra de búsqueda simple -->
+        <div class="search-section-simple">
+          <div class="search-container-simple">
+            <div class="search-input-wrapper-simple">
+              <Search :size="20" class="search-icon-simple" />
+              <input 
+                class="search-input-simple" 
+                type="text" 
+                placeholder="Buscar productos..." 
+                v-model="searchTerm"
+              />
             </div>
-          </div>
-          <div class="control is-fullwidth-mobile">
-            <div class="select is-fullwidth">
-              <select v-model="selectedCategory">
+            <div class="category-select-simple">
+              <select v-model="selectedCategory" class="category-select">
                 <option value="">Todas las categorías</option>
                 <option v-for="cat in categories" :key="cat.slug" :value="cat.slug">
                   {{ cat.name }}
@@ -245,72 +278,81 @@ watch(featuredProductsChunks, (chunks) => {
         </div>
 
         <!-- Mensaje si no hay resultados -->
-        <div v-if="noResults" class="notification is-warning is-size-6-mobile">
-          <Search :size="18" class="mr-2" />
-          No se encontraron productos con esos criterios.
+        <div v-if="noResults" class="no-results-simple">
+          <Search :size="32" class="no-results-icon-simple" />
+          <h3>No se encontraron productos</h3>
+          <p>Intenta con otros términos de búsqueda</p>
         </div>
 
-        <!-- Productos -->
-        <div class="columns is-multiline is-variable is-2 is-centered is-flex is-justify-content-center" v-else>
-          <div class="column is-half-mobile is-one-third-tablet is-one-quarter-desktop" v-for="prod in products" :key="prod._id">
-            <div class="card is-fullheight">
-              <div class="card-image">
-                <figure class="image is-4by3" style="overflow:hidden;">
-                  <img :src="prod.imagen" :alt="prod.nombre" loading="lazy" style="object-fit: cover; width: 100%; height: 100%;" />
-                </figure>
-              </div>
-              <div class="card-content">
-                <p class="title is-6-mobile is-5-tablet">{{ prod.nombre }}</p>
-                <p class="subtitle is-7-mobile is-6-tablet has-text-primary">$ {{ prod.precio }}</p>
-                <p class="is-size-7-mobile">{{ prod.descripcion.substring(0, 80) }}...</p>
-              </div>
-              <footer class="card-footer is-flex-wrap-wrap">
-                <NuxtLink 
-                  :to="`/product/${prod._id}`" 
-                  class="card-footer-item is-size-7-mobile is-flex-grow-1"
-                >
-                  <Eye :size="16" class="mr-1" />
+        <!-- Grid de productos simple -->
+        <div v-else class="products-grid-simple">
+          <div 
+            v-for="product in products" 
+            :key="product._id" 
+            class="product-card-simple"
+          >
+            <!-- Imagen del producto -->
+            <div class="product-image-simple">
+              <img :src="product.imagen" :alt="product.nombre" loading="lazy" />
+              <div class="product-badge-simple" v-if="product.stock === 0">Sin stock</div>
+            </div>
+
+            <!-- Información del producto -->
+            <div class="product-info-simple">
+              <h3 class="product-title-simple">{{ product.nombre }}</h3>
+              <p class="product-price-simple">${{ product.precio }}</p>
+              <p class="product-description-simple">{{ product.descripcion.substring(0, 80) }}...</p>
+              
+              <div class="product-actions-simple">
+                <NuxtLink :to="`/product/${product._id}`" class="btn-view-simple">
+                  <Eye :size="16" />
                   Ver detalles
                 </NuxtLink>
-                <a 
-                  class="card-footer-item is-size-7-mobile is-flex-grow-1" 
-                  @click.prevent="addToCart(prod._id)"
+                <button 
+                  class="btn-cart-simple"
+                  :disabled="product.stock === 0"
+                  @click="addToCart(product._id)"
                 >
-                  <ShoppingCart :size="16" class="mr-1" />
-                  Agregar al carrito
-                </a>
-              </footer>
+                  <ShoppingCart :size="16" />
+                  {{ product.stock === 0 ? 'Sin stock' : 'Agregar' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Paginación Bulma responsive -->
-        <nav class="pagination is-centered mt-5 is-flex-wrap-wrap" role="navigation" aria-label="pagination" v-if="!noResults && totalPages > 1">
-          <a 
-            class="pagination-previous mb-2-mobile" 
-            @click.prevent="goToPage(currentPage - 1)"
+        <!-- Paginación simple -->
+        <div v-if="!noResults && totalPages > 1" class="pagination-simple">
+          <button 
+            class="pagination-btn-simple prev"
+            :disabled="currentPage === 1"
+            @click="goToPage(currentPage - 1)"
           >
-            <ChevronLeft :size="16" class="mr-1" />
+            <ChevronLeft :size="16" />
             Anterior
-          </a>
-          <a 
-            class="pagination-next mb-2-mobile" 
-            @click.prevent="goToPage(currentPage + 1)"
+          </button>
+          
+          <div class="pagination-numbers-simple">
+            <button 
+              v-for="page in totalPages" 
+              :key="page"
+              class="pagination-number-simple"
+              :class="{ active: page === currentPage }"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+          </div>
+          
+          <button 
+            class="pagination-btn-simple next"
+            :disabled="currentPage === totalPages"
+            @click="goToPage(currentPage + 1)"
           >
             Siguiente
-            <ChevronRight :size="16" class="ml-1" />
-          </a>
-
-          <ul class="pagination-list is-flex-wrap-wrap">
-            <li v-for="page in totalPages" :key="page">
-              <a 
-                class="pagination-link mb-1-mobile" 
-                :class="{ 'is-current': page === currentPage }" 
-                @click.prevent="goToPage(page)"
-              >{{ page }}</a>
-            </li>
-          </ul>
-        </nav>
+            <ChevronRight :size="16" />
+          </button>
+        </div>
       </div>
     </section>
 

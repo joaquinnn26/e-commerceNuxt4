@@ -88,7 +88,7 @@ const save = async () => {
       uploadError.value = null
     }, 100)
   } catch (error) {
-    console.error('Error al guardar producto:', error)
+    // Error silencioso - el usuario ya ve el resultado
   }
 }
 </script>

@@ -25,7 +25,7 @@ async function createUser(userData) {
     }
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const newUser =await User.create({ email, passwordHash, name ,telefono})
+    const newUser = await User.create({ email, passwordHash, name, telefono})
     await Cart.create({ userId: newUser._id, items: [] });
     return {
     id: newUser._id,

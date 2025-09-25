@@ -19,24 +19,83 @@ async function getProductById(id) {
 export const getPaginatedProducts = async (page = 1, limit = 8, category = null, search = '') => {
   await connectDB();
 
-  const filter = {};
+  let products, total;
 
-  // Filtrar por categoría si existe
-  if (category) filter.categoria = category;
-
-  // Filtrar por búsqueda en el nombre si existe
-  if (search) filter.nombre = { $regex: search, $options: 'i' };
-
-  const skip = (page - 1) * limit;
-
-  const [data, total] = await Promise.all([
-    Product.find(filter).skip(skip).limit(limit),
-    Product.countDocuments(filter),
-  ]);
+  // Si hay búsqueda, usar filtrado en memoria
+  if (search && search.trim()) {
+    try {
+      // Cargar todos los productos
+      const allProducts = await Product.find()
+        .sort({ createdAt: -1 }); // Más recientes primero
+      
+      // Filtrar en memoria por el término de búsqueda
+      const searchTerm = search.trim().toLowerCase();
+      let filteredProducts = allProducts.filter(product => {
+        // Buscar en nombre del producto
+        if (product.nombre && product.nombre.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        // Buscar en descripción del producto
+        if (product.descripcion && product.descripcion.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        // Buscar en categoría del producto
+        if (product.categoria && product.categoria.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        return false;
+      });
+      
+      // Aplicar filtro de categoría si existe
+      if (category) {
+        filteredProducts = filteredProducts.filter(product => 
+          product.categoria && product.categoria.toLowerCase() === category.toLowerCase()
+        );
+      }
+      
+      
+      // Aplicar paginación
+      total = filteredProducts.length;
+      const skip = (page - 1) * limit;
+      products = filteredProducts.slice(skip, skip + limit);
+      
+    } catch (error) {
+      // Fallback a sin búsqueda
+      const filter = category ? { categoria: category } : {};
+      products = await Product.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+      
+      total = await Product.countDocuments(filter);
+    }
+    
+  } else {
+    // Sin búsqueda, usar consulta normal con filtro de categoría
+    const filter = category ? { categoria: category } : {};
+    
+    products = await Product.find(filter)
+      .sort({ createdAt: -1 }) // Más recientes primero
+      .skip((page - 1) * limit)
+      .limit(limit);
+    
+    total = await Product.countDocuments(filter);
+  }
 
   const totalPages = Math.ceil(total / limit);
 
-  return { data, totalPages, currentPage: page };
+  return { 
+    data: products, 
+    totalPages, 
+    currentPage: page,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalProducts: total,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1
+    }
+  };
 };
 async function createProduct(producto) {
     await connectDB();

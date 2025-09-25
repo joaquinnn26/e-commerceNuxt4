@@ -7,12 +7,23 @@ const props = defineProps({
 
 const emit = defineEmits(['confirm'])
 
+const formatDate = (date) => {
+  if (!date) return 'N/A'
+  return new Date(date).toLocaleDateString('es-CO', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 const confirmOrder = async (id) => {
   try {
-    await $fetch(`/api/orders/${id}/confirm`, { method: 'POST' })
+    await $fetch(`/api/orders/confirm/${id}`, { method: 'POST' })
     emit('confirm')
   } catch (err) {
-    console.error('Error confirmando orden', err)
+    // Error silencioso - el usuario ya ve el resultado
   }
 }
 </script>
@@ -26,6 +37,8 @@ const confirmOrder = async (id) => {
           <tr>
             <th>ID</th>
             <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Fecha</th>
             <th>Total</th>
             <th>Acción</th>
           </tr>
@@ -33,7 +46,9 @@ const confirmOrder = async (id) => {
         <tbody>
           <tr v-for="order in orders" :key="order._id">
             <td>{{ order._id }}</td>
-            <td>{{ order.customerName }}</td>
+            <td>{{ order.userId?.name || 'N/A' }}</td>
+            <td>{{ order.userId?.telefono || 'N/A' }}</td>
+            <td>{{ formatDate(order.createdAt) }}</td>
             <td>${{ order.total }}</td>
             <td>
               <button 
